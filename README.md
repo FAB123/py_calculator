@@ -5,6 +5,7 @@ This is a my first Python GUI program. when i plan to create a program i think i
 ## Key Features
 
 * Speech Support.
+* Can Enable and Disable TTS.
 * Can use keyboard instead use.
 
 ## Installation

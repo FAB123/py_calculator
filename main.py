@@ -15,7 +15,7 @@ class calculator():
     engine.dispaly(fkt)
     fkt.bind('<KeyPress>', engine.keystrock)
     fkt.bind('<Return>', engine.callback)
-    engine.set_buttons()
+    engine.set_buttons(fkt)
 
     #call Gui
     fkt.mainloop()
