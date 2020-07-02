@@ -10,6 +10,30 @@ class calc_core:
         self.sound = pyttsx3.init()
         self.sound.setProperty('rate', 150)
 
+    #set Menus
+    def set_menu(self, fkt):
+        self.master = fkt
+        menu = Menu(self.master)
+        self.master.config(menu=menu)
+
+        fileMenu = Menu(menu, tearoff=0)
+        fileMenu.add_command(label="Help")
+        fileMenu.add_command(label="About", command=self.aboutProgram)
+        fileMenu.add_separator()
+        fileMenu.add_command(label="Exit", command=self.exitProgram)
+        menu.add_cascade(label="File", menu=fileMenu)
+
+    def aboutProgram(self):
+        fkt = Tk()
+        fkt.geometry("300x300")
+        fkt.title("About Program")
+        fkt.iconbitmap("calculator.ico")
+        fkt.configure(bg="white")
+        fkt.resizable(0, 0)
+
+    def exitProgram(self):
+        exit()
+
     #get screen value
     def screen_text(self):
         return self.C.itemcget(ALL, 'text')
@@ -41,7 +65,7 @@ class calc_core:
     def dispaly(self, fkt):
         self.C = Canvas(fkt, bd=4, bg="#8c8c89", height=80, width=340)
         self.C.create_text(340, 40, font=("Purisa", 30), anchor=E, justify=RIGHT, text="Welcome", tags = "display")
-        self.C.grid(rowspan=1, columnspan=4, padx=1, pady=15)
+        self.C.grid(rowspan=1, columnspan=4, padx=0, pady=15)
 
     #update screen
     def update_dispaly(self, data):
@@ -62,7 +86,7 @@ class calc_core:
 
     #core method
     def press_me(self, key):
-        if key == "+" or key == "-" or key == "*" or key == "/" or key == "%" or key == "r" or key == "pie" or key == "^" or key == "e" or key == "!":
+        if key == "+" or key == "-" or key == "*" or key == "/" or key == "%" or key == "^" or key == "e" or key == "!":
             if key == "+":
                 self.operator = "add"
             elif key == "-":
@@ -104,20 +128,32 @@ class calc_core:
             self.result = "0"
             self.update_dispaly(self.memory)
 
-        elif key == "M-":
-            self.memory = "0"
-            self.update_dispaly("Memory Cleaned")
-
         elif key == "AC":
             self.value1 = "0"
             self.keys = "0"
             self.result = "0"
+            key = "Clear"
             self.update_dispaly("0.0")
 
         elif key == "ln":
-            self.value1 = int(self.screen_text())
+            self.value1 = float(self.screen_text())
             self.result = math.log(self.value1)
             self.memory = "natural logarithm of " + str(self.value1) + " = " + str(self.result)
+            self.update_dispaly(self.result)
+
+        elif key == "√":
+            self.value1 = float(self.screen_text())
+            self.result = math.sqrt(self.value1)
+            self.memory = "√ of " + str(self.value1) + " = " + str(self.result)
+            self.update_dispaly(self.result)
+
+        elif key == "pie":
+            self.value1 = float(self.screen_text())
+            ##self.pie = math.pi()
+           # print(math.pi())
+            self.result = float(self.value1) * math.pi
+           # self.result = math.pi()
+            self.memory = "pi of " + str(self.value1) + " = " + str(self.result)
             self.update_dispaly(self.result)
 
         elif key == "sin":
@@ -127,17 +163,16 @@ class calc_core:
             self.update_dispaly(self.result)
 
         elif key == "cos":
-            self.value1 = int(self.screen_text())
+            self.value1 = float(self.screen_text())
             self.result = math.cos(self.value1)
             self.memory = "cos of " + str(self.value1) + " = " + str(self.result)
             self.update_dispaly(self.result)
 
         elif key == "tan":
-            self.value1 = int(self.screen_text())
+            self.value1 = float(self.screen_text())
             self.result = math.tan(self.value1)
             self.memory = "tan of " + str(self.value1) + " = " + str(self.result)
             self.update_dispaly(self.result)
-
 
         elif key == "equal":
             if self.operator == "add":
@@ -161,7 +196,7 @@ class calc_core:
                 self.value1 = self.result
                 self.update_dispaly(self.result)
             elif self.operator == "percent":
-                self.result = float(self.value1) % float(self.keys)
+                self.result = (float(self.value1) * float(self.keys)) / 100
                 self.memory = str(self.value1) + " % " + str(self.keys) + " = " + str(self.result)
                 self.value1 = self.result
                 self.update_dispaly(self.result)
@@ -170,9 +205,6 @@ class calc_core:
                 self.memory = str(self.value1) + " root " + str(self.keys) + " = " + str(self.result)
                 self.value1 = self.result
                 self.update_dispaly(self.result)
-
-
-
 
             if str(self.tts_enabled.get()) == "1":
                 self.say(self.memory)
@@ -192,7 +224,7 @@ class calc_core:
     def set_buttons(self, fkt):
         #keys = ["AC", "^", "r", "%","pie", "e", "sin","cos", "tan", "!", "ln", "mr", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", ".", "0", "sum"]
         #keys = ["AC", "MR", "Si", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", ".", "0", "sum"]
-        keys = ["AC", "MR", "Fx", "/", "%", "r", "7", "8", "9", "*", "pie", "^", "4", "5", "6", "-", "sin", "e", "1", "2", "3", "+", "tan", "ln", ".", "0", "sum", "cos", "!"]
+        keys = ["AC", "MR", "Fx", "/", "%", "√", "7", "8", "9", "*", "pie", "^", "4", "5", "6", "-", "sin", "e", "1", "2", "3", "+", "tan", "ln", ".", "0", "sum", "cos", "!"]
         n_row, n_col, t_row = 1, 0, 1
         for x in keys:
             if x == 'sum':
@@ -204,21 +236,17 @@ class calc_core:
             elif x == 'Fx':
                 buttons = Button(text=x, width=7, height=3, relief=RIDGE, font=("Courier New", 8, 'bold'), bd=2,
                                  command=lambda: self.resize(fkt))
-                buttons.config(font=('Courier New', 14, 'bold'), bg='#ffe699', fg="#ff00ff")
+                buttons.config(font=('Courier New', 14, 'bold'), bg='#ffe699', fg="white")
                 buttons.grid(row=n_row, column=n_col, pady=3, padx=3)
                 if n_col == 5:
-                    buttons.config(font=('Courier New', 14, 'bold'), bg='#ffbf00', fg="white")
                     n_row, t_row, n_col = 2 + t_row, t_row + 1, 0
                 else:
                     n_col = n_col + 1
             else:
                 buttons = Button(text=x, width=7, height=3, relief=RIDGE, font=("Courier New", 8, 'bold'), bd=2, command=lambda x=x: self.press_me(x))
-                buttons.config(font=('Courier New', 14, 'bold'), bg='#ffe699', fg="#ff00ff")
+                buttons.config(font=('Courier New', 14, 'bold'), bg='#ffe699', fg="white")
                 buttons.grid(row=n_row, column=n_col, pady=3, padx=3)
-                if n_col == 3:
-                    buttons.config(font=('Courier New', 14, 'bold'), bg='#ffbf00', fg="white")
                 if n_col == 5:
-                    #buttons.config(font=('Courier New', 14, 'bold'), bg='#ffbf00', fg="white")
                     n_row, t_row, n_col = 2 + t_row, t_row + 1, 0
                 else:
                     n_col = n_col + 1
