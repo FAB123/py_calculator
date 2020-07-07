@@ -278,11 +278,13 @@ class calc_core:
             if "exit" in command:
                 self.say("Thank's for using our voice calculator!")
                 break
-            elif "start" in command:
+
+            elif "calc" in command:
                 notExit = True
-                command = self.takeCommand()
-                print("starting " + command)
+
                 while (notExit):
+                    command = self.takeCommand()
+                    print("starting " + command)
                     if "quit" in command:
                         self.say("Thank's for using our voice calculator!")
                         break
@@ -293,11 +295,23 @@ class calc_core:
                         except:
                             self.say("Sorry try again!")
 
+                    elif "clear" in command:
+                        try:
+                            self.press_me("AC")
+                        except:
+                            self.say("Sorry try again!")
+
                     elif "add" in command:
                         try:
                             self.press_me("+")
                         except:
                             self.say("Sorry try again!")
+                    elif "equal" in command:
+                        try:
+                            self.press_me("equal")
+                        except:
+                            self.say("Sorry try again!")
+
                     elif "subtraction" in command:
                         try:
                             self.press_me("-")
@@ -319,10 +333,15 @@ class calc_core:
         r = sr.Recognizer()
         with sr.Microphone() as source:
             print("Listening ...")
+            C.delete("voice_command")
+            C.create_text(175, 75, font=("Purisa", 12), text="Listening ...", justify=RIGHT, tags = "voice_command")
+            r.adjust_for_ambient_noise(source)
             r.pause_threshold = 1
             audio = r.listen(source, timeout=1, phrase_time_limit=5)
         try:
             print("Recognizing ...")
+            C.delete("voice_command")
+            C.create_text(175, 75, font=("Purisa", 12), text="Recognizing ...", justify=RIGHT, tags="voice_command")
             query = r.recognize_google(audio, language='en-in')
             print(f"user: {query}")
         except:
