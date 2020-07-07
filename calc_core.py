@@ -1,4 +1,5 @@
 from tkinter import *
+import speech_recognition as sr
 import pyttsx3
 import math
 
@@ -30,6 +31,12 @@ class calc_core:
         fkt.iconbitmap("calculator.ico")
         fkt.configure(bg="white")
         fkt.resizable(0, 0)
+        Label(fkt, text="About", anchor=CENTER, font=('Courier New', 16, 'bold'), bg="white").pack()
+        about = "This my Python Gui Program \nThe best way to find yourself is to lose yourself in the service of others.\n(Mahatma Gandhi)"
+        msg = Message(fkt, text=about, anchor=CENTER, width=290)
+        msg.config(bg='white', font=('times', 15, 'italic'))
+        msg.pack()
+
 
     def exitProgram(self):
         exit()
@@ -63,21 +70,22 @@ class calc_core:
 
     # Set Welcome Screen
     def dispaly(self, fkt):
-        self.C = Canvas(fkt, bd=4, bg="#8c8c89", height=80, width=340)
-        self.C.create_text(340, 40, font=("Purisa", 30), anchor=E, justify=RIGHT, text="Welcome", tags = "display")
-        self.C.grid(rowspan=1, columnspan=4, padx=0, pady=15)
+        global C
+        C = Canvas(fkt, bd=4, bg="#8c8c89", height=80, width=350)
+        C.create_text(350, 40, font=("Purisa", 30), anchor=E, justify=RIGHT, text="Welcome", tags = "display")
+        C.grid(rowspan=1, columnspan=4, padx=0, pady=5)
 
     #update screen
     def update_dispaly(self, data):
-        self.C.delete(ALL)
+        C.delete(ALL)
         if self.screen == "0":
-            self.C.configure(width=340)
-            self.C.create_text(340, 40, font=("Purisa", 30), text=data, anchor=E, justify=RIGHT)
-            self.C.grid(columnspan=4)
+            C.configure(width=350)
+            C.create_text(350, 40, font=("Purisa", 30), text=data, anchor=E, justify=RIGHT)
+            C.grid(columnspan=4)
         else:
-            self.C.configure(width=540)
-            self.C.create_text(535, 40, font=("Purisa", 30), text=data, anchor=E, justify=RIGHT)
-            self.C.grid(columnspan=6)
+            C.configure(width=540)
+            C.create_text(540, 40, font=("Purisa", 30), text=data, anchor=E, justify=RIGHT)
+            C.grid(columnspan=6)
 
     #tts updates
     def say(self, text):
@@ -113,8 +121,8 @@ class calc_core:
                 self.operator = "cos"
             elif key == "!":
                 self.operator = "factorial"
-            self.C.delete("opration")
-            self.C.create_text(15, 40, font=("Purisa", 30), text=key, justify=RIGHT, tags = "opration")
+            C.delete("opration")
+            C.create_text(15, 40, font=("Purisa", 30), text=key, justify=RIGHT, tags = "opration")
 
             if self.result == "0":
                 self.value1 = self.keys
@@ -206,7 +214,7 @@ class calc_core:
                 self.value1 = self.result
                 self.update_dispaly(self.result)
 
-            if str(self.tts_enabled.get()) == "1":
+            if str(tts_enabled.get()) == "1":
                 self.say(self.memory)
         else:
             if self.keys == "0":
@@ -215,7 +223,7 @@ class calc_core:
                 self.keys = str(self.keys) + str(key)
             self.update_dispaly(self.keys)
 
-        if str(self.tts_enabled.get()) == "1":
+        if str(tts_enabled.get()) == "1":
             if key != "equal":
                 print(key)
                 self.say(key)
@@ -252,8 +260,78 @@ class calc_core:
                     n_col = n_col + 1
 
         #set check box
-        self.tts_enabled = IntVar(value=1)
-        C2 = Checkbutton(text="Enable Text to Speech", variable=self.tts_enabled, \
+        global tts_enabled
+        tts_enabled = IntVar(value=1)
+        C2 = Checkbutton(text="Enable Text to Speech", variable=tts_enabled, \
                          onvalue=1, offvalue=0, height=1, \
                          width=48)
         C2.grid(row=7, column=0, columnspan=4)
+
+    # internal process for voice recognaisation
+    def txt(self):
+        #self.say("Welcome to the voice calculator")
+        start = True
+        while (start):
+            self.options()
+            command = self.takeCommand()
+            print("initializing " + command)
+            if "exit" in command:
+                self.say("Thank's for using our voice calculator!")
+                break
+            elif "start" in command:
+                notExit = True
+                command = self.takeCommand()
+                print("starting " + command)
+                while (notExit):
+                    if "quit" in command:
+                        self.say("Thank's for using our voice calculator!")
+                        break
+
+                    elif command.isnumeric():
+                        try:
+                           self.press_me(command)
+                        except:
+                            self.say("Sorry try again!")
+
+                    elif "add" in command:
+                        try:
+                            self.press_me("+")
+                        except:
+                            self.say("Sorry try again!")
+                    elif "subtraction" in command:
+                        try:
+                            self.press_me("-")
+                        except:
+                            self.say("Sorry try again!")
+                    elif "multi" in command:
+                        try:
+                            self.press_me("*")
+                        except:
+                            self.say("Sorry try again!")
+                    elif "div" in command:
+                        try:
+                            self.press_me("/")
+                        except:
+                            self.say("Sorry try again!")
+
+    def takeCommand(self):
+        """Returns string output from microphone"""
+        r = sr.Recognizer()
+        with sr.Microphone() as source:
+            print("Listening ...")
+            r.pause_threshold = 1
+            audio = r.listen(source, timeout=1, phrase_time_limit=5)
+        try:
+            print("Recognizing ...")
+            query = r.recognize_google(audio, language='en-in')
+            print(f"user: {query}")
+        except:
+            self.say("Say That again please")
+            return "None"
+        return query
+
+
+    def options(self):
+        self.say("Which kind of operation would you like to perform?")
+        #self.say("Addition, subtraction, multiplication or division")
+        #self.say("Say Exit for close the calculator")
