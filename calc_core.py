@@ -25,25 +25,25 @@ class calc_core:
         menu.add_cascade(label="File", menu=fileMenu)
 
     def aboutProgram(self):
-        fkt = Tk()
-        fkt.geometry("300x300")
-        fkt.title("About Program")
+        fkt = Toplevel()
+        fkt.geometry("375x300")
+        fkt.title("Simple Calculator With Voice")
         fkt.iconbitmap("calculator.ico")
-        fkt.configure(bg="white")
-        fkt.resizable(0, 0)
-        Label(fkt, text="About", anchor=CENTER, font=('Courier New', 16, 'bold'), bg="white").pack()
-        about = "This my Python Gui Program \nThe best way to find yourself is to lose yourself in the service of others.\n(Mahatma Gandhi)"
+        photo = PhotoImage(file="mg.png")
+        label = Label(fkt, image=photo, height="300", width="375", anchor=CENTER)
+        label.image = photo  # keep a reference!
+        label.grid(row=0, column=0)
+        about = "This my Python Gui Program \nThe second aim of this program is help some one visually impaired. \n i would like to say there is no one is disabled, we all are enabled with technology.\n at this time i would like to say thanks to CROSSROADS team for all valuable supports \n The best way to find yourself is to lose yourself in the service of others.\n(Mahatma Gandhi)"
         msg = Message(fkt, text=about, anchor=CENTER, width=290)
-        msg.config(bg='white', font=('times', 15, 'italic'))
-        msg.pack()
-
+        msg.config(font=('times', 13, 'italic'))
+        msg.grid(row=0, column=0)
 
     def exitProgram(self):
         exit()
 
     #get screen value
     def screen_text(self):
-        return self.C.itemcget(ALL, 'text')
+        return C.itemcget(ALL, 'text')
 
     #resize screen
     def resize(self, fkt):
@@ -273,20 +273,30 @@ class calc_core:
         start = True
         while (start):
             self.options()
-            command = self.takeCommand()
-            print("initializing " + command)
+            if str(tts_enabled.get()) == "0":
+                C.delete("voice_command")
+                C.create_text(175, 75, font=("Purisa", 12), text="Voice Command Disabled!!", justify=RIGHT,
+                              tags="voice_command")
+                continue
+            else:
+                command = self.takeCommand()
             if "exit" in command:
                 self.say("Thank's for using our voice calculator!")
                 break
 
             elif "calc" in command:
                 notExit = True
-
                 while (notExit):
                     command = self.takeCommand()
                     print("starting " + command)
                     if "quit" in command:
                         self.say("Thank's for using our voice calculator!")
+                        break
+
+                    elif str(tts_enabled.get()) == "0":
+                        notExit = False
+                        C.delete("voice_command")
+                        C.create_text(175, 75, font=("Purisa", 12), text="Voice Command Disabled!!", justify=RIGHT, tags="voice_command")
                         break
 
                     elif command.isnumeric():
