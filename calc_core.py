@@ -26,16 +26,13 @@ class calc_core:
 
     def aboutProgram(self):
         fkt = Toplevel()
-        fkt.geometry("375x300")
+        fkt.geometry("345x300")
         fkt.title("Simple Calculator With Voice")
         fkt.iconbitmap("calculator.ico")
-        photo = PhotoImage(file="mg.png")
-        label = Label(fkt, image=photo, height="300", width="375", anchor=CENTER)
-        label.image = photo  # keep a reference!
-        label.grid(row=0, column=0)
+        fkt.configure(bg="black")
         about = "This my Python Gui Program \nThe second aim of this program is help some one visually impaired. \n i would like to say there is no one is disabled, we all are enabled with technology.\n at this time i would like to say thanks to CROSSROADS team for all valuable supports \n The best way to find yourself is to lose yourself in the service of others.\n(Mahatma Gandhi)"
-        msg = Message(fkt, text=about, anchor=CENTER, width=290)
-        msg.config(font=('times', 13, 'italic'))
+        msg = Message(fkt, text=about, anchor=CENTER, width=340, bg="black", fg="white")
+        msg.config(font=('times', 14, 'italic'))
         msg.grid(row=0, column=0)
 
     def exitProgram(self):
@@ -105,20 +102,10 @@ class calc_core:
                 self.operator = "divide"
             elif key == "%":
                 self.operator = "percent"
-            elif key == "r":
-                self.operator = "root"
-            elif key == "pie":
-                self.operator = "pie"
             elif key == "^":
                 self.operator = "exponentiation"
-            elif key == "sin":
-                self.operator = "sin"
             elif key == "e":
                 self.operator = "e"
-            elif key == "tan":
-                self.operator = "tan"
-            elif key == "cos":
-                self.operator = "cos"
             elif key == "!":
                 self.operator = "factorial"
             C.delete("opration")
@@ -157,10 +144,7 @@ class calc_core:
 
         elif key == "pie":
             self.value1 = float(self.screen_text())
-            ##self.pie = math.pi()
-           # print(math.pi())
             self.result = float(self.value1) * math.pi
-           # self.result = math.pi()
             self.memory = "pi of " + str(self.value1) + " = " + str(self.result)
             self.update_dispaly(self.result)
 
@@ -217,8 +201,19 @@ class calc_core:
             if str(tts_enabled.get()) == "1":
                 self.say(self.memory)
         else:
-            if self.keys == "0":
+            if key == "+/-":
+                if (self.keys != "0"):
+                    print("s" + self.keys)
+                    if (int(self.keys) < 0):
+                        self.keys = self.keys[1:]
+                    else:
+                        self.keys = "-" + self.keys[0:]
+                else:
+                    self.keys = "-"
+
+            elif self.keys == "0":
                 self.keys = str(key)
+
             else:
                 self.keys = str(self.keys) + str(key)
             self.update_dispaly(self.keys)
@@ -232,7 +227,7 @@ class calc_core:
     def set_buttons(self, fkt):
         #keys = ["AC", "^", "r", "%","pie", "e", "sin","cos", "tan", "!", "ln", "mr", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", ".", "0", "sum"]
         #keys = ["AC", "MR", "Si", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", ".", "0", "sum"]
-        keys = ["AC", "MR", "Fx", "/", "%", "√", "7", "8", "9", "*", "pie", "^", "4", "5", "6", "-", "sin", "e", "1", "2", "3", "+", "tan", "ln", ".", "0", "sum", "cos", "!"]
+        keys = ["AC", "+/-", "Fx", "/", "%", "√", "7", "8", "9", "*", "pie", "^", "4", "5", "6", "-", "sin", "e", "1", "2", "3", "+", "tan", "ln", ".", "0", "sum", "cos", "!"]
         n_row, n_col, t_row = 1, 0, 1
         for x in keys:
             if x == 'sum':
@@ -347,7 +342,10 @@ class calc_core:
             C.create_text(175, 75, font=("Purisa", 12), text="Listening ...", justify=RIGHT, tags = "voice_command")
             r.adjust_for_ambient_noise(source)
             r.pause_threshold = 1
-            audio = r.listen(source, timeout=1, phrase_time_limit=5)
+            try:
+               audio = r.listen(source, timeout=1, phrase_time_limit=5)
+            except:
+                return "None"
         try:
             print("Recognizing ...")
             C.delete("voice_command")
