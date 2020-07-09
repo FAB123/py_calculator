@@ -91,7 +91,7 @@ class calc_core:
 
     #core method
     def press_me(self, key):
-        if key == "+" or key == "-" or key == "*" or key == "/" or key == "%" or key == "^" or key == "e" or key == "!":
+        if key == "+" or key == "-" or key == "*" or key == "/" or key == "%" or key == "^" or key == "log":
             if key == "+":
                 self.operator = "add"
             elif key == "-":
@@ -104,10 +104,8 @@ class calc_core:
                 self.operator = "percent"
             elif key == "^":
                 self.operator = "exponentiation"
-            elif key == "e":
-                self.operator = "e"
-            elif key == "!":
-                self.operator = "factorial"
+            elif key == "log":
+                self.operator = "log"
             C.delete("opration")
             C.create_text(15, 40, font=("Purisa", 30), text=key, justify=RIGHT, tags = "opration")
 
@@ -147,6 +145,15 @@ class calc_core:
             self.result = float(self.value1) * math.pi
             self.memory = "pi of " + str(self.value1) + " = " + str(self.result)
             self.update_dispaly(self.result)
+
+        elif key == "!":
+            self.value1 = float(self.screen_text())
+            if self.value1 < 0 :
+                self.update_dispaly("ERROR: Factorials allow only < 0")
+            else:
+                self.result = math.factorial(self.value1)
+                self.memory = "factorial of " + str(self.value1) + " = " + str(self.result)
+                self.update_dispaly(self.result)
 
         elif key == "sin":
             self.value1 = int(self.screen_text())
@@ -198,6 +205,18 @@ class calc_core:
                 self.value1 = self.result
                 self.update_dispaly(self.result)
 
+            elif self.operator == "exponentiation":
+                self.result = math.pow(float(self.value1),  float(self.keys))
+                self.memory = str(self.value1) + " root " + str(self.keys) + " = " + str(self.result)
+                self.value1 = self.result
+                self.update_dispaly(self.result)
+
+            elif self.operator == "log":
+                self.result = math.log(float(self.value1),  float(self.keys))
+                self.memory = "log of " + str(self.value1) + " base " + str(self.keys) + " = " + str(self.result)
+                self.value1 = self.result
+                self.update_dispaly(self.result)
+
             if str(tts_enabled.get()) == "1":
                 self.say(self.memory)
         else:
@@ -227,7 +246,7 @@ class calc_core:
     def set_buttons(self, fkt):
         #keys = ["AC", "^", "r", "%","pie", "e", "sin","cos", "tan", "!", "ln", "mr", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", ".", "0", "sum"]
         #keys = ["AC", "MR", "Si", "/", "7", "8", "9", "*", "4", "5", "6", "-", "1", "2", "3", "+", ".", "0", "sum"]
-        keys = ["AC", "+/-", "Fx", "/", "%", "√", "7", "8", "9", "*", "pie", "^", "4", "5", "6", "-", "sin", "e", "1", "2", "3", "+", "tan", "ln", ".", "0", "sum", "cos", "!"]
+        keys = ["AC", "+/-", "Fx", "/", "%", "√", "7", "8", "9", "*", "pie", "^", "4", "5", "6", "-", "sin", "log", "1", "2", "3", "+", "tan", "ln", ".", "0", "sum", "cos", "!"]
         n_row, n_col, t_row = 1, 0, 1
         for x in keys:
             if x == 'sum':
