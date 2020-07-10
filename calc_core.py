@@ -38,9 +38,17 @@ class calc_core:
     def exitProgram(self):
         exit()
 
+    def theme(self):
+        blue = "#00bfff"
+        megenta = "#ff0066"
+
     #get screen value
     def screen_text(self):
-        return C.itemcget(ALL, 'text')
+        c_value = C.itemcget(ALL, 'text')
+        if (c_value == "Welcome"):
+            return "0"
+        else:
+            return C.itemcget(ALL, 'text')
 
     #resize screen
     def resize(self, fkt):
@@ -222,7 +230,6 @@ class calc_core:
         else:
             if key == "+/-":
                 if (self.keys != "0"):
-                    print("s" + self.keys)
                     if (int(self.keys) < 0):
                         self.keys = self.keys[1:]
                     else:
@@ -239,7 +246,6 @@ class calc_core:
 
         if str(tts_enabled.get()) == "1":
             if key != "equal":
-                print(key)
                 self.say(key)
 
     #set Buttons
@@ -252,13 +258,13 @@ class calc_core:
             if x == 'sum':
                 buttons = Button(text="=", width=13, height=3, relief=RIDGE, font=("Courier New", 8, 'bold'), bd=2,
                                  command=lambda: self.press_me('equal'))
-                buttons.config(font=('Courier New', 16, 'bold'), bg='#ffbf00', fg="white")
+                buttons.config(font=('Courier New', 16, 'bold'), bg='#ff9900', fg="white", activebackground="#ffa31a", activeforeground="white")
                 buttons.grid(row=n_row, column=n_col, columnspan=2, pady=3, padx=3)
                 n_col = n_col + 2
             elif x == 'Fx':
                 buttons = Button(text=x, width=7, height=3, relief=RIDGE, font=("Courier New", 8, 'bold'), bd=2,
                                  command=lambda: self.resize(fkt))
-                buttons.config(font=('Courier New', 14, 'bold'), bg='#ffe699', fg="white")
+                buttons.config(font=('Courier New', 14, 'bold'), bg='#ffbf00', fg="white", activebackground="#ffc61a", activeforeground="white")
                 buttons.grid(row=n_row, column=n_col, pady=3, padx=3)
                 if n_col == 5:
                     n_row, t_row, n_col = 2 + t_row, t_row + 1, 0
@@ -266,7 +272,9 @@ class calc_core:
                     n_col = n_col + 1
             else:
                 buttons = Button(text=x, width=7, height=3, relief=RIDGE, font=("Courier New", 8, 'bold'), bd=2, command=lambda x=x: self.press_me(x))
-                buttons.config(font=('Courier New', 14, 'bold'), bg='#ffe699', fg="white")
+                buttons.config(font=('Courier New', 14, 'bold'), bg='#ffbf00', fg="white", activebackground="#ffc61a", activeforeground="white")
+                if n_col == 3:
+                    buttons.config(font=('Courier New', 14, 'bold'), bg='#ff9900', fg="white", activebackground="#ffa31a", activeforeground="white")
                 buttons.grid(row=n_row, column=n_col, pady=3, padx=3)
                 if n_col == 5:
                     n_row, t_row, n_col = 2 + t_row, t_row + 1, 0
