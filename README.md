@@ -1,6 +1,13 @@
 # Simple Calculator with voice
 
-This is a my first Python GUI program. when i plan to create a program i think i want some thing different. so i added voice support to this program, it may help some one who suffered vision disability. 
+This is a my first Python GUI program. when i plan to create a program i think i want some thing different. so i added voice support to this program, it may help some one who suffered vision disability.
+
+Image:
+
+![](img/1.PNG) 
+![](img/2.PNG) 
+![](img/3.PNG) 
+
 
 ## Key Features
 
