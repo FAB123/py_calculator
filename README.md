@@ -29,7 +29,7 @@ pip install pyttsx3
 This Program require speech_recognition library to enable voice.
 
 ```bash
-pip install speech_recognition
+pip install SpeechRecognition
 ```
 
 ## Additional Requirement
@@ -44,6 +44,12 @@ if you get error when use speech_recognition may need some additional components
 
 ```bash
 python -m pip install PyAudio
+```
+Windows
+
+```bash
+pip install pipwin
+pipwin install pyaudio
 ```
 
 ## Contributing
