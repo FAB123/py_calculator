@@ -4,6 +4,8 @@ import speech_recognition as sr
 import pyttsx3
 import math
 import threading
+import time
+
 
 
 class Core:
@@ -17,7 +19,11 @@ class Core:
         global buttons, flag
         # global flag
         buttons = {}
-        self._running = False
+        global mylist
+        mylist = []
+        global pools
+        pools = True
+
 
     # set Menus
     def set_menu(self, fkt):
@@ -171,18 +177,31 @@ class Core:
         if text in word_dict:
             text = word_dict[text]
 
-        self.process_one = threading.Thread(target=self.say_voice, args=(text,), daemon=True)
-        self.process_one.start()
+        self.add_to_list = threading.Thread(target=self.add_to_voice_list, args=(text,), daemon=True)
+        if (pools):
+            self.say_from_list = threading.Thread(target=self.say_voice, daemon=True)
+            self.add_to_list.start()
+            self.say_from_list.start()
+        else:
+           self.add_to_list.start()
 
-    def say_voice(self, text):
-        #if tts_enabled.get() == 1:
-            #self.sound.say(text)
-            #self.sound.runAndWait()
-            engine = pyttsx3.init()
-            engine.say('The quick brown fox jumped over the lazy dog.', 'fox')
-            engine.startLoop(False)
-            engine.endLoop()
 
+    def add_to_voice_list(self, text):
+        mylist.append(text)
+
+    def say_voice(self):
+        global pools
+        pools = False
+        self.sound.startLoop(False)
+        while mylist:
+            try:
+                self.sound.say(mylist[0])
+                self.sound.iterate()
+                del mylist[0]
+            except:
+                continue
+        self.sound.endLoop()
+        pools = True
 
     # core method
     def press_me(self, key):
@@ -389,12 +408,12 @@ class Core:
 
     # internal process for voice recognition
     def get_voice_input(self):
-        # self.say("Welcome to the voice calculator")
         tts_enabled = IntVar(value=1)
-        self.options()
+        pools = IntVar(value=0)
+        self.sound.say("To Start Voice Command Say Calculator or say exit to exit Voice Command Mode")
+        self.sound.runAndWait()
         start = True
         while (start):
-            #self.options()
             if str(tts_enabled.get()) == "0":
                 try:
                     if flag != 1:
@@ -489,6 +508,3 @@ class Core:
             self.say("Say That again please")
             return "None"
         return query
-
-    def options(self):
-        self.say("To Start Voice Command Say Calculator or say exit to exit Voice Command Mode")

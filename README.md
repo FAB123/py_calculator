@@ -2,21 +2,24 @@
 
 This is a my first Python GUI program. when i plan to create a program i think i want some thing different. so i added voice support to this program, it may help some one who suffered vision disability.
 
-Image:
+Images:
 
 ![](img/1.PNG) 
+#
 ![](img/2.PNG) 
+#
 ![](img/3.PNG) 
-
+#
+![](img/4.PNG) 
 
 ## Key Features
 
-* Voice recognition
+* Voice recognition.
 * Speech Support.
 * Can Enable and Disable TTS.
 * Can use keyboard instead use.
-* Change Theme (High Contrast Theme Available)
-* Build in Help file
+* Change Theme (High Contrast Theme Available).
+* Build in Help file.
 
 ## Installation
 
@@ -68,7 +71,7 @@ Please make sure to update tests as appropriate.
   |  Sign  |         Definition           |
 | ------ | ------ |
   |   %    |         Percentage           |
-  |   v    |         square root          |
+  |   v    |         Square root          |
   |  pie   |             pie              |
   |   ^    |       exponentiation         |
   |  log   |          logarithm           |
@@ -77,7 +80,7 @@ Please make sure to update tests as appropriate.
   |  sin   |             sin              |
   |  cos   |             cos              |
   |   !    |          factorial           |
-  |   Fx   |                              |
+  |   Fx   |         More Function        |
   |   +    |            add               |
   |   -    |           subtract           |
   |   *    |         multiplied by        |
