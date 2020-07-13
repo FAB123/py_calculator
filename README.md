@@ -17,9 +17,12 @@ Images:
 * Voice recognition.
 * Speech Support.
 * Can Enable and Disable TTS.
-* Can use keyboard instead use.
-* Change Theme (High Contrast Theme Available).
-* Build in Help file.
+* Can use keyboard instead of mouse click.
+* Various Themes (High Contrast Theme Available).
+* Detailed in Help file.
+
+#### Planed Addons
+* gesture support
 
 ## Installation
 
@@ -61,7 +64,7 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 Please make sure to update tests as appropriate.
 
-##Usage Guide
+#### Usage Guide
 
     +----------------------------------+
     |       Basic key definition       |
@@ -87,16 +90,17 @@ Please make sure to update tests as appropriate.
   |   /    |            divided           |
   |   =    |              equal           |
 
-## Supported Voice Commands 
-######   Note : Program Find Specifed Command in your word eg :- if you said "addition" program detect "add" then excute addition fuction 
-   
+#### Supported Voice Commands 
+
+###### Note : Program Find Specified Command in your word eg :- if you said "addition" program detect "add" then excute addition fuction 
+  
  |Command | Definition|
  | ------ | ------ |
  | Calculator  |      Start Voice Command     |
  |    Quit     |      Quit Voice Command      |
  |    Clear    |        Clear Screen          |
  |     add     |         addition             |
- |     sub     |        Substration           | |    multi    |         multiple             |
+ |     sub     |        Subtraction           | |    multi    |         multiple             |
  |      div    |          divide              |
  |    Equal    |          equal               |
 

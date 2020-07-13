@@ -4,13 +4,11 @@ import speech_recognition as sr
 import pyttsx3
 import math
 import threading
-import time
-
 
 
 class Core:
     def __init__(self):
-        self.keys, self.result, self.screen = "0", "0", "0"
+        self.keys, self.result, self.screen, self.value1 = "0", "0", "0", False
         global keys
         keys = ["AC", "+/-", "Fx", "/", "%", "√", "7", "8", "9", "*", "pie", "^", "4", "5", "6", "-", "sin", "log", "1",
                 "2", "3", "+", "tan", "ln", ".", "0", "sum", "cos", "!"]
@@ -206,16 +204,33 @@ class Core:
     # core method
     def press_me(self, key):
         if key == "+" or key == "-" or key == "*" or key == "/" or key == "%" or key == "^" or key == "log":
+            if (self.value1) and (self.operator):
+                if self.operator == "add":
+                    self.result = float(self.value1) + float(self.keys)
+                    self.memory = str(self.value1) + "+" + str(self.keys) + " = " + str(self.result)
+                elif self.operator == "subtract":
+                    self.result = float(self.value1) - float(self.keys)
+                    self.memory = str(self.value1) + "-" + str(self.keys) + " = " + str(self.result)
+                elif self.operator == "multiple":
+                    self.result = float(self.value1) * float(self.keys)
+                    self.memory = str(self.value1) + " * " + str(self.keys) + " = " + str(self.result)
+                elif self.operator == "divide":
+                    self.result = float(self.value1) / float(self.keys)
+                    self.memory = str(self.value1) + " / " + str(self.keys) + " = " + str(self.result)
+                elif self.operator == "percent":
+                    self.result = (float(self.value1) * float(self.keys)) / 100
+                    self.memory = str(self.value1) + " % " + str(self.keys) + " = " + str(self.result)
+                elif self.operator == "exponentiation":
+                    self.result = math.pow(float(self.value1), float(self.keys))
+                    self.memory = str(self.value1) + " root " + str(self.keys) + " = " + str(self.result)
+                elif self.operator == "log":
+                    self.result = math.log(float(self.value1), float(self.keys))
+                    self.memory = "log of " + str(self.value1) + " base " + str(self.keys) + " = " + str(self.result)
+                self.update_dispaly(self.result)
+                self.value1, self.keys = self.result, "0"
+
             if key == "+":
                 self.operator = "add"
-                try:
-                    if (self.value1):
-                        self.result = float(self.value1) + float(self.keys)
-                        self.memory = str(self.value1) + "+" + str(self.keys) + " = " + str(self.result)
-                        self.value1 = self.result
-                        self.update_dispaly(self.result)
-                except:
-                    print("new")
             elif key == "-":
                 self.operator = "subtract"
             elif key == "*":
@@ -299,44 +314,44 @@ class Core:
             if self.operator == "add":
                 self.result = float(self.value1) + float(self.keys)
                 self.memory = str(self.value1) + "+" + str(self.keys) + " = " + str(self.result)
-                self.value1 = self.result
+                self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
             elif self.operator == "subtract":
                 self.result = float(self.value1) - float(self.keys)
                 self.memory = str(self.value1) + " - " + str(self.keys) + " = " + str(self.result)
-                self.value1 = self.result
+                self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
             elif self.operator == "multiple":
                 self.result = float(self.value1) * float(self.keys)
                 self.memory = str(self.value1) + " * " + str(self.keys) + " = " + str(self.result)
-                self.value1 = self.result
+                self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
             elif self.operator == "divide":
                 self.result = float(self.value1) / float(self.keys)
                 self.memory = str(self.value1) + " / " + str(self.keys) + " = " + str(self.result)
-                self.value1 = self.result
+                self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
             elif self.operator == "percent":
                 self.result = (float(self.value1) * float(self.keys)) / 100
                 self.memory = str(self.value1) + " % " + str(self.keys) + " = " + str(self.result)
-                self.value1 = self.result
+                self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
             elif self.operator == "root":
                 self.result = float(self.keys) ** (1 / float(self.value1))
                 self.memory = str(self.value1) + " root " + str(self.keys) + " = " + str(self.result)
-                self.value1 = self.result
+                self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
 
             elif self.operator == "exponentiation":
                 self.result = math.pow(float(self.value1), float(self.keys))
                 self.memory = str(self.value1) + " root " + str(self.keys) + " = " + str(self.result)
-                self.value1 = self.result
+                self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
 
             elif self.operator == "log":
                 self.result = math.log(float(self.value1), float(self.keys))
                 self.memory = "log of " + str(self.value1) + " base " + str(self.keys) + " = " + str(self.result)
-                self.value1 = self.result
+                self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
 
             if str(tts_enabled.get()) == "1":
@@ -410,7 +425,7 @@ class Core:
     def get_voice_input(self):
         tts_enabled = IntVar(value=1)
         pools = IntVar(value=0)
-        self.sound.say("To Start Voice Command Say Calculator or say exit to exit Voice Command Mode")
+        self.sound.say("Say Calculator to bigin using voice calculator or say exit to end Voice Command Mode")
         self.sound.runAndWait()
         start = True
         while (start):
