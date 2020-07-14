@@ -4,6 +4,7 @@ import speech_recognition as sr
 import pyttsx3
 import math
 import threading
+import time
 
 
 class Core:
@@ -17,8 +18,9 @@ class Core:
         global buttons, flag
         # global flag
         buttons = {}
-        global mylist
+        global mylist, operation_history
         mylist = []
+        operation_history = {}
         global pools
         pools = True
 
@@ -67,7 +69,6 @@ class Core:
         with open("help.bin", 'r') as f:
             configfile.insert(INSERT, base64.b64decode(f.read()))
         configfile.pack(fill="none", expand=TRUE)
-        root.mainloop()
 
     def exitprogram(self):
         exit()
@@ -111,11 +112,11 @@ class Core:
 
     # get screen value
     def screen_text(self):
-        c_value = C.itemcget(ALL, 'text')
+        c_value = C.itemcget("display", 'text')
         if c_value == "Welcome":
             return "0"
         else:
-            return C.itemcget(ALL, 'text')
+            return c_value
 
     # resize screen
     def resize(self, fkt):
@@ -145,18 +146,31 @@ class Core:
         global C
         C = Canvas(fkt, bd=4, bg="#8c8c89", height=80, width=350)
         C.create_text(350, 40, font=("Purisa", 30), anchor=E, justify=RIGHT, text="Welcome", tags="display")
+        C.create_text(25, 78, font=("Purisa", 10), justify=RIGHT, text="History", tags="playbutton")
+        C.tag_bind("playbutton", "<Button-1>", self.history)
         C.grid(rowspan=1, columnspan=4, padx=0, pady=5)
+
+    def history(self, *args):
+        history = Toplevel()
+        history.title("History")
+        history.iconbitmap("calculator.ico")
+        history.resizable(0, 0)
+        configfile = Text(history, wrap=WORD, width=50, height=35)
+        for ctime, record in operation_history.items():
+            configfile.insert(INSERT, "Time: "+ctime + "\n")
+            configfile.insert(INSERT, "         " + record + "\n")
+        configfile.pack(fill="none", expand=TRUE)
 
     # update screen
     def update_dispaly(self, data):
-        C.delete(ALL)
+        C.delete("display")
         if self.screen == "0":
             C.configure(width=350)
-            C.create_text(350, 40, font=("Purisa", 30), text=data, anchor=E, justify=RIGHT)
+            C.create_text(350, 40, font=("Purisa", 30), text=data, anchor=E, justify=RIGHT, tags="display")
             C.grid(columnspan=4)
         else:
             C.configure(width=540)
-            C.create_text(540, 40, font=("Purisa", 30), text=data, anchor=E, justify=RIGHT)
+            C.create_text(540, 40, font=("Purisa", 30), text=data, anchor=E, justify=RIGHT, tags="display")
             C.grid(columnspan=6)
 
     # tts updates
@@ -176,7 +190,7 @@ class Core:
             text = word_dict[text]
 
         self.add_to_list = threading.Thread(target=self.add_to_voice_list, args=(text,), daemon=True)
-        if (pools):
+        if pools:
             self.say_from_list = threading.Thread(target=self.say_voice, daemon=True)
             self.add_to_list.start()
             self.say_from_list.start()
@@ -204,28 +218,35 @@ class Core:
     # core method
     def press_me(self, key):
         if key == "+" or key == "-" or key == "*" or key == "/" or key == "%" or key == "^" or key == "log":
-            if (self.value1) and (self.operator):
+            if (self.value1) and (self.operator) and (self.keys):
                 if self.operator == "add":
                     self.result = float(self.value1) + float(self.keys)
                     self.memory = str(self.value1) + "+" + str(self.keys) + " = " + str(self.result)
+                    operation_history[time.strftime("%H:%M:%S")] = (self.memory)
                 elif self.operator == "subtract":
                     self.result = float(self.value1) - float(self.keys)
                     self.memory = str(self.value1) + "-" + str(self.keys) + " = " + str(self.result)
+                    operation_history[time.strftime("%H:%M:%S")] = (self.memory)
                 elif self.operator == "multiple":
                     self.result = float(self.value1) * float(self.keys)
                     self.memory = str(self.value1) + " * " + str(self.keys) + " = " + str(self.result)
+                    operation_history[time.strftime("%H:%M:%S")] = (self.memory)
                 elif self.operator == "divide":
                     self.result = float(self.value1) / float(self.keys)
                     self.memory = str(self.value1) + " / " + str(self.keys) + " = " + str(self.result)
+                    operation_history[time.strftime("%H:%M:%S")] = (self.memory)
                 elif self.operator == "percent":
                     self.result = (float(self.value1) * float(self.keys)) / 100
                     self.memory = str(self.value1) + " % " + str(self.keys) + " = " + str(self.result)
+                    operation_history[time.strftime("%H:%M:%S")] = (self.memory)
                 elif self.operator == "exponentiation":
                     self.result = math.pow(float(self.value1), float(self.keys))
                     self.memory = str(self.value1) + " root " + str(self.keys) + " = " + str(self.result)
+                    operation_history[time.strftime("%H:%M:%S")] = (self.memory)
                 elif self.operator == "log":
                     self.result = math.log(float(self.value1), float(self.keys))
                     self.memory = "log of " + str(self.value1) + " base " + str(self.keys) + " = " + str(self.result)
+                    operation_history[time.strftime("%H:%M:%S")] = (self.memory)
                 self.update_dispaly(self.result)
                 self.value1, self.keys = self.result, "0"
 
@@ -252,17 +273,13 @@ class Core:
                 self.value1 = self.result
             self.keys = "0"
 
-        elif key == "MR":
-            self.value1 = "0"
-            self.keys = "0"
-            self.result = "0"
-            self.update_dispaly(self.memory)
-
         elif key == "AC":
             self.value1 = "0"
             self.keys = "0"
+            self.operator = False
             self.result = "0"
             key = "Clear"
+            C.delete("opration")
             self.update_dispaly("0.0")
 
         elif key == "ln":
@@ -270,18 +287,21 @@ class Core:
             self.result = math.log(self.value1)
             self.memory = "natural logarithm of " + str(self.value1) + " = " + str(self.result)
             self.update_dispaly(self.result)
+            operation_history[time.strftime("%H:%M:%S")] = (self.memory)
 
         elif key == "√":
             self.value1 = float(self.screen_text())
             self.result = math.sqrt(self.value1)
             self.memory = "√ of " + str(self.value1) + " = " + str(self.result)
             self.update_dispaly(self.result)
+            operation_history[time.strftime("%H:%M:%S")] = (self.memory)
 
         elif key == "pie":
             self.value1 = float(self.screen_text())
             self.result = float(self.value1) * math.pi
             self.memory = "pi of " + str(self.value1) + " = " + str(self.result)
             self.update_dispaly(self.result)
+            operation_history[time.strftime("%H:%M:%S")] = (self.memory)
 
         elif key == "!":
             self.value1 = float(self.screen_text())
@@ -291,24 +311,28 @@ class Core:
                 self.result = math.factorial(self.value1)
                 self.memory = "factorial of " + str(self.value1) + " = " + str(self.result)
                 self.update_dispaly(self.result)
+                operation_history[time.strftime("%H:%M:%S")] = (self.memory)
 
         elif key == "sin":
             self.value1 = int(self.screen_text())
             self.result = math.sin(self.value1)
             self.memory = "sin of " + str(self.value1) + " = " + str(self.result)
             self.update_dispaly(self.result)
+            operation_history[time.strftime("%H:%M:%S")] = (self.memory)
 
         elif key == "cos":
             self.value1 = float(self.screen_text())
             self.result = math.cos(self.value1)
             self.memory = "cos of " + str(self.value1) + " = " + str(self.result)
             self.update_dispaly(self.result)
+            operation_history[time.strftime("%H:%M:%S")] = (self.memory)
 
         elif key == "tan":
             self.value1 = float(self.screen_text())
             self.result = math.tan(self.value1)
             self.memory = "tan of " + str(self.value1) + " = " + str(self.result)
             self.update_dispaly(self.result)
+            operation_history[time.strftime("%H:%M:%S")] = (self.memory)
 
         elif key == "equal":
             if self.operator == "add":
@@ -316,44 +340,54 @@ class Core:
                 self.memory = str(self.value1) + "+" + str(self.keys) + " = " + str(self.result)
                 self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
+                operation_history[time.strftime("%H:%M:%S")] = (self.memory)
             elif self.operator == "subtract":
                 self.result = float(self.value1) - float(self.keys)
                 self.memory = str(self.value1) + " - " + str(self.keys) + " = " + str(self.result)
                 self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
+                operation_history[time.strftime("%H:%M:%S")] = (self.memory)
             elif self.operator == "multiple":
                 self.result = float(self.value1) * float(self.keys)
                 self.memory = str(self.value1) + " * " + str(self.keys) + " = " + str(self.result)
                 self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
+                operation_history[time.strftime("%H:%M:%S")] = (self.memory)
             elif self.operator == "divide":
                 self.result = float(self.value1) / float(self.keys)
                 self.memory = str(self.value1) + " / " + str(self.keys) + " = " + str(self.result)
                 self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
+                operation_history[time.strftime("%H:%M:%S")] = (self.memory)
             elif self.operator == "percent":
                 self.result = (float(self.value1) * float(self.keys)) / 100
                 self.memory = str(self.value1) + " % " + str(self.keys) + " = " + str(self.result)
                 self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
+                operation_history[time.strftime("%H:%M:%S")] = (self.memory)
             elif self.operator == "root":
                 self.result = float(self.keys) ** (1 / float(self.value1))
                 self.memory = str(self.value1) + " root " + str(self.keys) + " = " + str(self.result)
                 self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
+                operation_history[time.strftime("%H:%M:%S")] = (self.memory)
 
             elif self.operator == "exponentiation":
                 self.result = math.pow(float(self.value1), float(self.keys))
                 self.memory = str(self.value1) + " root " + str(self.keys) + " = " + str(self.result)
                 self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
+                operation_history[time.strftime("%H:%M:%S")] = (self.memory)
 
             elif self.operator == "log":
                 self.result = math.log(float(self.value1), float(self.keys))
                 self.memory = "log of " + str(self.value1) + " base " + str(self.keys) + " = " + str(self.result)
                 self.value1, self.keys = self.result, "0"
                 self.update_dispaly(self.result)
+                operation_history[time.strftime("%H:%M:%S")] = (self.memory)
 
+            C.delete("opration")
+            self.operator = False
             if str(tts_enabled.get()) == "1":
                 self.say(self.memory)
         else:
