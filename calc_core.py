@@ -6,7 +6,6 @@ import math
 import threading
 import time
 
-
 class Core:
     def __init__(self):
         self.keys, self.result, self.screen, self.value1 = "0", "0", "0", False
@@ -15,15 +14,13 @@ class Core:
                 "2", "3", "+", "tan", "ln", ".", "0", "sum", "cos", "!"]
         self.sound = pyttsx3.init()
         self.sound.setProperty('rate', 130)
-        global buttons, flag
+        global buttons, flag, mylist, operation_history, pools
+
         # global flag
         buttons = {}
-        global mylist, operation_history
         mylist = []
         operation_history = {}
-        global pools
         pools = True
-
 
     # set Menus
     def set_menu(self, fkt):
@@ -95,6 +92,10 @@ class Core:
         elif option == 5:
             theme = ["black", "#40C090", "black", "#40C090", "black", "#40C090", "black", "#40C090"]
         n_col = 0
+        b_buttons.config(bg=theme[4], fg=theme[5], activebackground=theme[6], activeforeground=theme[7])
+        w.config(bg="white", fg=theme[0], activebackground="white", activeforeground=theme[7])
+        s.config(bg="white", fg=theme[0])
+        h_buttons.config(bg=theme[0], fg=theme[1], activebackground=theme[2], activeforeground=theme[3])
         for x in keys:
             if x == 'sum':
                 buttons[x].config(bg=theme[4], fg=theme[5], activebackground=theme[6], activeforeground=theme[7])
@@ -121,10 +122,10 @@ class Core:
     # resize screen
     def resize(self, fkt):
         if self.screen == "0":
-            fkt.geometry("560x590")
+            fkt.geometry("560x615")
             self.screen = "1"
         else:
-            fkt.geometry("375x590")
+            fkt.geometry("375x615")
             self.screen = "0"
         self.update_dispaly(self.screen_text())
 
@@ -146,8 +147,6 @@ class Core:
         global C
         C = Canvas(fkt, bd=4, bg="#8c8c89", height=80, width=350)
         C.create_text(350, 40, font=("Purisa", 30), anchor=E, justify=RIGHT, text="Welcome", tags="display")
-        C.create_text(25, 78, font=("Purisa", 10), justify=RIGHT, text="History", tags="playbutton")
-        C.tag_bind("playbutton", "<Button-1>", self.history)
         C.grid(rowspan=1, columnspan=4, padx=0, pady=5)
 
     def history(self, *args):
@@ -156,8 +155,8 @@ class Core:
         history.iconbitmap("calculator.ico")
         history.resizable(0, 0)
         configfile = Text(history, wrap=WORD, width=50, height=35)
-        for ctime, record in operation_history.items():
-            configfile.insert(INSERT, "Time: "+ctime + "\n")
+        for time, record in operation_history.items():
+            configfile.insert(INSERT, "Time: "+ time + "\n")
             configfile.insert(INSERT, "         " + record + "\n")
         configfile.pack(fill="none", expand=TRUE)
 
@@ -411,9 +410,33 @@ class Core:
             if key != "equal":
                 self.say(key)
 
+    def back_space(self):
+        if self.keys:
+            self.keys = self.keys[:-1]
+            self.update_dispaly(self.keys)
+
     # set Buttons
     def set_buttons(self, fkt):
-        n_row, n_col, t_row = 1, 0, 1
+        global audio_status, tts_enabled, w, s, h_buttons, b_buttons
+        tts_enabled, audio_status = StringVar(), StringVar()
+        h_buttons = Button(text=u"\u27f3", width=4, height=1, relief=RIDGE, font=("Courier New", 16),
+                            command=lambda: self.history())
+        h_buttons.config(bg='#ffbf00', fg="white", activebackground="#ffa31a", activeforeground="white")
+        h_buttons.grid(row=1, column=0, columnspan=1, sticky=W, pady=3, padx=3)
+
+        s = Label(fkt, textvariable=audio_status, font=("Helvetica", 10), bg='white', fg="#ff9900")
+        s.grid(row=1, column=1, columnspan=1, sticky=W, pady=3, padx=3)
+
+        w = Label(fkt, text=u"\u266b", font=("Courier New", 20), bg='white', fg="#ff9900")
+        w.grid(row=1, column=2, columnspan=1, sticky=E, pady=3, padx=3)
+        w.bind("<Button-1>", lambda e :self.enable_disable_audio())
+
+        b_buttons = Button(text=u"\u232B", width=4, height=1, relief=RIDGE, font=("Courier New", 16),
+                            command=lambda: self.back_space())
+        b_buttons.config(bg='#ff9900', fg="white", activebackground="#ffa31a", activeforeground="white")
+        b_buttons.grid(row=1, column=3, columnspan=1, sticky=E, pady=3, padx=3)
+
+        n_row, n_col, t_row = 2, 0, 1
 
         for x in keys:
             if x == 'sum':
@@ -447,28 +470,26 @@ class Core:
                 else:
                     n_col = n_col + 1
 
-        # set check box
-        global tts_enabled
-        tts_enabled = IntVar(value=1)
-        C2 = Checkbutton(text="Enable Text to Speech", variable=tts_enabled, \
-                         onvalue=1, offvalue=0, height=1, \
-                         width=48)
-        C2.grid(row=7, column=0, columnspan=4)
+    def enable_disable_audio(self):
+        if str(tts_enabled.get()) == "0":
+            tts_enabled.set("1")
+            w.config(text=u"\u266b")
+        else:
+            tts_enabled.set("0")
+            w.config(text=u"\u2297")
 
     # internal process for voice recognition
     def get_voice_input(self):
         tts_enabled = IntVar(value=1)
         pools = IntVar(value=0)
-        self.sound.say("Say Calculator to bigin using voice calculator or say exit to end Voice Command Mode")
+        self.sound.say("Say Calculator to begin using voice calculator or say exit to end Voice Command Mode")
         self.sound.runAndWait()
         start = True
         while (start):
             if str(tts_enabled.get()) == "0":
                 try:
                     if flag != 1:
-                        C.delete("voice_command")
-                        C.create_text(175, 75, font=("Purisa", 12), text="Voice Command Disabled!!", justify=RIGHT,
-                                      tags="voice_command")
+                        audio_status.set("Voice Command Disabled!!")
                     flag = 1
                     continue
                 except:
@@ -491,9 +512,7 @@ class Core:
 
                     elif str(tts_enabled.get()) == "0":
                         notExit = False
-                        C.delete("voice_command")
-                        C.create_text(175, 75, font=("Purisa", 12), text="Voice Command Disabled!!", justify=RIGHT,
-                                      tags="voice_command")
+                        audio_status.set("Voice Command Disabled!!")
                         break
 
                     elif command.isnumeric():
@@ -539,8 +558,7 @@ class Core:
         # Returns string output from microphone
         r = sr.Recognizer()
         with sr.Microphone() as source:
-            C.delete("voice_command")
-            C.create_text(175, 75, font=("Purisa", 12), text="Listening ...", justify=RIGHT, tags="voice_command")
+            audio_status.set("Listening ...")
             r.adjust_for_ambient_noise(source)
             r.pause_threshold = 1
             try:
@@ -548,9 +566,7 @@ class Core:
             except:
                 return "None"
         try:
-            print("Recognizing ...")
-            C.delete("voice_command")
-            C.create_text(175, 75, font=("Purisa", 12), text="Recognizing ...", justify=RIGHT, tags="voice_command")
+            audio_status.set("Recognizing ...")
             query = r.recognize_google(audio, language='en-in')
             print(f"user: {query}")
         except:
