@@ -32,6 +32,10 @@ This Program require pyttsx3 library to enable voice.
 pip install pyttsx3
 ```
 
+Ubuntu / Linux Mint
+```bash
+sudo apt install libespeak-dev
+```
 This Program require speech_recognition library to enable voice.
 
 ```bash
@@ -57,7 +61,11 @@ Windows
 pip install pipwin
 pipwin install pyaudio
 ```
-
+Ubuntu 
+```bash
+sudo add-apt-repository universe
+sudo apt-get install python-pyaudio python3-pyaudio
+```
 ## Contributing
 The program on initial stage, We try to implement more features.
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.

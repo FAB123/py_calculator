@@ -1,5 +1,5 @@
 from tkinter import *
-import pyttsx3, math, threading, time, os, sys, base64, speech_recognition as sr
+import pyttsx3, math, threading, time, os, base64, speech_recognition as sr
 
 
 class Core:
@@ -596,12 +596,10 @@ class Core:
                 time.sleep(0.001)
         else:
             import time
-            import sys
             for i in range(count):
-                sys.stdout.write('\r\a{i}'.format(i=i))
-                sys.stdout.flush()
-                time.sleep(1)
-            sys.stdout.write('\n')
+
+                os.system('play -nq -t alsa synth {} sine {}'.format(0.1, 3000))
+                time.sleep(0.001)
 
     def takecommand(self):
         # Returns string output from microphone
