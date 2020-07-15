@@ -1,10 +1,6 @@
 from tkinter import *
-import base64
-import speech_recognition as sr
-import pyttsx3
-import math
-import threading
-import time
+import pyttsx3, math, threading, time, os, sys, base64, speech_recognition as sr
+
 
 class Core:
     def __init__(self):
@@ -124,9 +120,15 @@ class Core:
         if self.screen == "0":
             fkt.geometry("560x615")
             self.screen = "1"
+            b_buttons.grid(row=1, column=5, columnspan=1)
+            w.grid(row=1, column=4, columnspan=1)
+            s.grid(columnspan=2)
         else:
             fkt.geometry("375x615")
             self.screen = "0"
+            b_buttons.grid(row=1, column=3, columnspan=1)
+            w.grid(row=1, column=2, columnspan=1)
+            s.grid(columnspan=1)
         self.update_dispaly(self.screen_text())
 
     # scan enter key
@@ -424,10 +426,10 @@ class Core:
         h_buttons.config(bg='#ffbf00', fg="white", activebackground="#ffa31a", activeforeground="white")
         h_buttons.grid(row=1, column=0, columnspan=1, sticky=W, pady=3, padx=3)
 
-        s = Label(fkt, textvariable=audio_status, font=("Helvetica", 10), bg='white', fg="#ff9900")
+        s = Label(fkt, textvariable=audio_status, font=("Helvetica", 8), bg='white', fg="#ff9900")
         s.grid(row=1, column=1, columnspan=1, sticky=W, pady=3, padx=3)
 
-        w = Label(fkt, text=u"\u266b", font=("Courier New", 20), bg='white', fg="#ff9900")
+        w = Label(fkt, text=u"\u266B", font=("Courier New", 20), bg='white', fg="#ff9900")
         w.grid(row=1, column=2, columnspan=1, sticky=E, pady=3, padx=3)
         w.bind("<Button-1>", lambda e :self.enable_disable_audio())
 
@@ -476,11 +478,11 @@ class Core:
             w.config(text=u"\u266b")
         else:
             tts_enabled.set("0")
-            w.config(text=u"\u2297")
+            w.config(text=u"\u26D4")
 
     # internal process for voice recognition
     def get_voice_input(self):
-        tts_enabled = IntVar(value=1)
+        tts_enabled = StringVar(value="1")
         pools = IntVar(value=0)
         self.sound.say("Say Calculator to begin using voice calculator or say exit to end Voice Command Mode")
         self.sound.runAndWait()
@@ -504,6 +506,7 @@ class Core:
 
             elif "calc" in command:
                 notExit = True
+                self.say("Calculator Started, Say arguments")
                 while (notExit):
                     command = self.takecommand()
                     if "quit" in command:
@@ -553,11 +556,59 @@ class Core:
                             self.press_me("/")
                         except:
                             self.say("Sorry try again!")
+                    elif "back" in command:
+                        try:
+                            self.back_space()
+                        except:
+                            self.say("Sorry try again!")
+                    elif "perce" in command:
+                        try:
+                            self.press_me("%")
+                        except:
+                            self.say("Sorry try again!")
+                    elif "pie" in command:
+                        try:
+                            self.press_me("pie")
+                        except:
+                            self.say("Sorry try again!")
+                    elif "sin" in command:
+                        try:
+                            self.press_me("sin")
+                        except:
+                            self.say("Sorry try again!")
+                    elif "cos" in command:
+                        try:
+                            self.press_me("cos")
+                        except:
+                            self.say("Sorry try again!")
+                    elif "tan" in command:
+                        try:
+                            self.press_me("tan")
+                        except:
+                            self.say("Sorry try again!")
+
+    def beep(self, count=1):
+        if os.name == 'nt':
+            import winsound
+            import time
+            for x in range(count):
+                winsound.Beep(3000, 150)
+                time.sleep(0.001)
+        else:
+            import time
+            import sys
+            for i in range(count):
+                sys.stdout.write('\r\a{i}'.format(i=i))
+                sys.stdout.flush()
+                time.sleep(1)
+            sys.stdout.write('\n')
 
     def takecommand(self):
         # Returns string output from microphone
         r = sr.Recognizer()
         with sr.Microphone() as source:
+            # time.sleep(1)
+            # self.beep(2)
             audio_status.set("Listening ...")
             r.adjust_for_ambient_noise(source)
             r.pause_threshold = 1
@@ -566,10 +617,12 @@ class Core:
             except:
                 return "None"
         try:
+
+            # self.beep()
             audio_status.set("Recognizing ...")
             query = r.recognize_google(audio, language='en-in')
-            print(f"user: {query}")
+            # time.sleep(1)
         except:
-            self.say("Say That again please")
+            self.say("Sorry try again!")
             return "None"
         return query
