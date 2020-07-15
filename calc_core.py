@@ -418,7 +418,7 @@ class Core:
     # set Buttons
     def set_buttons(self, fkt):
         global audio_status, tts_enabled, w, s, h_buttons, b_buttons
-        tts_enabled, audio_status = StringVar(), StringVar()
+        tts_enabled, audio_status = StringVar(value="1"), StringVar()
         h_buttons = Button(text=u"\u27f3", width=4, height=1, relief=RIDGE, font=("Courier New", 16),
                             command=lambda: self.history())
         h_buttons.config(bg='#ffbf00', fg="white", activebackground="#ffa31a", activeforeground="white")
